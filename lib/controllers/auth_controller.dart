@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../routes/app_routes.dart';
+import 'favorite_controller.dart';
 
 class AuthController extends GetxController {
   final RxString username = ''.obs;
@@ -15,6 +16,9 @@ class AuthController extends GetxController {
   Future<void> _loadUsername() async {
     final prefs = await SharedPreferences.getInstance();
     username.value = prefs.getString('username') ?? '';
+    if (username.value.isNotEmpty) {
+      Get.find<FavoriteController>().loadForUser(username.value);
+    }
   }
 
   Future<bool> login(String inputUsername, String password) async {
@@ -22,6 +26,7 @@ class AuthController extends GetxController {
     await prefs.setBool('isLoggedIn', true);
     await prefs.setString('username', inputUsername);
     username.value = inputUsername;
+    Get.find<FavoriteController>().loadForUser(inputUsername);
     Get.offAllNamed(Routes.MAIN);
     return true;
   }
@@ -30,6 +35,7 @@ class AuthController extends GetxController {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('isLoggedIn');
     await prefs.remove('username');
+    Get.find<FavoriteController>().loadForUser('');
     username.value = '';
     Get.offAllNamed(Routes.LOGIN);
   }
