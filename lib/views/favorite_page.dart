@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../controllers/favorite_controller.dart';
+import '../models/favorite_show_model.dart';
 import '../routes/app_routes.dart';
 
 class FavoritePage extends StatelessWidget {
@@ -21,27 +22,19 @@ class FavoritePage extends StatelessWidget {
               children: [
                 Icon(Icons.favorite_border, color: Colors.grey, size: 64),
                 SizedBox(height: 16),
-                Text(
-                  'Belum ada favorit',
-                  style: TextStyle(color: Colors.grey, fontSize: 16),
-                ),
+                Text('Belum ada favorit', style: TextStyle(color: Colors.grey, fontSize: 16)),
                 SizedBox(height: 8),
-                Text(
-                  'Tambahkan show favoritmu dari Home!',
-                  style: TextStyle(color: Colors.grey, fontSize: 13),
-                ),
+                Text('Tambahkan show favoritmu dari Home!', style: TextStyle(color: Colors.grey, fontSize: 13)),
               ],
             ),
           );
         }
 
-        return ListView.builder(
+        return ListView(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          itemCount: favController.favorites.length,
-          itemBuilder: (context, index) {
-            final show = favController.favorites[index];
+          children: favController.favorites.map((show) {
             return _FavoriteCard(show: show, favController: favController);
-          },
+          }).toList(),
         );
       }),
     );
@@ -49,18 +42,15 @@ class FavoritePage extends StatelessWidget {
 }
 
 class _FavoriteCard extends StatelessWidget {
-  final Map<String, dynamic> show;
+  final FavoriteShowModel show;
   final FavoriteController favController;
 
   const _FavoriteCard({required this.show, required this.favController});
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = show['image']?['medium'] as String?;
-    final rating = show['rating']?['average'];
-
     return GestureDetector(
-      onTap: () => Get.toNamed(Routes.DETAIL, arguments: show['id'] as int),
+      onTap: () => Get.toNamed(Routes.DETAIL, arguments: show.id),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(10),
@@ -72,9 +62,9 @@ class _FavoriteCard extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: imageUrl != null
+              child: show.imageUrl != null
                   ? Image.network(
-                      imageUrl,
+                      show.imageUrl!,
                       width: 64,
                       height: 64,
                       fit: BoxFit.cover,
@@ -82,8 +72,7 @@ class _FavoriteCard extends StatelessWidget {
                         width: 64,
                         height: 64,
                         color: Colors.grey[800],
-                        child:
-                            const Icon(Icons.broken_image, color: Colors.grey),
+                        child: const Icon(Icons.broken_image, color: Colors.grey),
                       ),
                     )
                   : Container(
@@ -99,12 +88,8 @@ class _FavoriteCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    show['name'] as String? ?? '-',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                    ),
+                    show.name,
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -114,9 +99,8 @@ class _FavoriteCard extends StatelessWidget {
                       const Icon(Icons.star, color: Colors.amber, size: 15),
                       const SizedBox(width: 4),
                       Text(
-                        rating != null ? rating.toString() : 'N/A',
-                        style: const TextStyle(
-                            color: Colors.white70, fontSize: 13),
+                        show.rating != null ? show.rating.toString() : 'N/A',
+                        style: const TextStyle(color: Colors.white70, fontSize: 13),
                       ),
                     ],
                   ),
@@ -124,8 +108,7 @@ class _FavoriteCard extends StatelessWidget {
               ),
             ),
             IconButton(
-              onPressed: () =>
-                  favController.removeFavorite(show['id'] as int),
+              onPressed: () => favController.removeFavorite(show.id),
               icon: const Icon(Icons.delete, color: Colors.red, size: 22),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),

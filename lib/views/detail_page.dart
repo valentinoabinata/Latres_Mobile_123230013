@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../controllers/favorite_controller.dart';
+import '../models/show_model.dart';
 import '../services/api_service.dart';
 
 class DetailPage extends StatefulWidget {
@@ -13,12 +14,11 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
-  Map<String, dynamic>? _show;
+  ShowModel? _show;
   bool _isLoading = true;
   String? _errorMessage;
 
   late final int _showId = Get.arguments as int;
-
   final FavoriteController _favController = Get.find<FavoriteController>();
 
   @override
@@ -46,8 +46,7 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
-  String _stripHtml(String html) =>
-      html.replaceAll(RegExp(r'<[^>]*>'), '').trim();
+  String _stripHtml(String html) => html.replaceAll(RegExp(r'<[^>]*>'), '').trim();
 
   @override
   Widget build(BuildContext context) {
@@ -60,11 +59,9 @@ class _DetailPageState extends State<DetailPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.error_outline,
-                          color: Colors.red, size: 60),
+                      const Icon(Icons.error_outline, color: Colors.red, size: 60),
                       const SizedBox(height: 12),
-                      Text(_errorMessage!,
-                          style: const TextStyle(color: Colors.grey)),
+                      Text(_errorMessage!, style: const TextStyle(color: Colors.grey)),
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: _loadDetail,
@@ -79,16 +76,8 @@ class _DetailPageState extends State<DetailPage> {
 
   Widget _buildContent() {
     final show = _show!;
-    final imageUrl =
-        (show['image']?['original'] ?? show['image']?['medium']) as String?;
-    final rating = show['rating']?['average'];
-    final genres = (show['genres'] as List?)?.join(', ') ?? '-';
-    final summary = show['summary'] != null
-        ? _stripHtml(show['summary'] as String)
-        : 'Tidak ada deskripsi.';
-    final network = show['network']?['name'] as String?;
-    final status = show['status'] as String?;
-    final premiered = show['premiered'] as String?;
+    final summary = show.summary != null ? _stripHtml(show.summary!) : 'Tidak ada deskripsi.';
+    final genresString = show.genres.isNotEmpty ? show.genres.join(', ') : '-';
 
     return SingleChildScrollView(
       child: Column(
@@ -96,9 +85,9 @@ class _DetailPageState extends State<DetailPage> {
         children: [
           Stack(
             children: [
-              imageUrl != null
+              show.imageUrl != null
                   ? Image.network(
-                      imageUrl,
+                      show.imageUrl!,
                       width: double.infinity,
                       height: 380,
                       fit: BoxFit.cover,
@@ -108,23 +97,20 @@ class _DetailPageState extends State<DetailPage> {
                           height: 380,
                           color: Colors.grey[850],
                           child: const Center(
-                            child:
-                                CircularProgressIndicator(color: Colors.red),
+                            child: CircularProgressIndicator(color: Colors.red),
                           ),
                         );
                       },
                       errorBuilder: (_, __, ___) => Container(
                         height: 280,
                         color: Colors.grey[850],
-                        child: const Icon(Icons.broken_image,
-                            color: Colors.grey, size: 80),
+                        child: const Icon(Icons.broken_image, color: Colors.grey, size: 80),
                       ),
                     )
                   : Container(
                       height: 280,
                       color: Colors.grey[850],
-                      child:
-                          const Icon(Icons.tv, color: Colors.grey, size: 80),
+                      child: const Icon(Icons.tv, color: Colors.grey, size: 80),
                     ),
               Positioned(
                 bottom: 0,
@@ -136,10 +122,7 @@ class _DetailPageState extends State<DetailPage> {
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.9),
-                      ],
+                      colors: [Colors.transparent, Colors.black.withOpacity(0.9)],
                     ),
                   ),
                 ),
@@ -152,46 +135,34 @@ class _DetailPageState extends State<DetailPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  show['name'] as String? ?? '-',
-                  style: const TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+                  show.name,
+                  style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 const SizedBox(height: 12),
                 Wrap(
                   spacing: 16,
                   runSpacing: 8,
                   children: [
-                    _infoChip(Icons.star, Colors.amber,
-                        rating != null ? '$rating / 10' : 'N/A'),
-                    if (status != null)
+                    _infoChip(Icons.star, Colors.amber, show.rating != null ? '${show.rating} / 10' : 'N/A'),
+                    if (show.status != null)
                       _infoChip(
-                        status == 'Running'
-                            ? Icons.fiber_manual_record
-                            : Icons.stop_circle_outlined,
-                        status == 'Running' ? Colors.green : Colors.grey,
-                        status,
+                        show.status == 'Running' ? Icons.fiber_manual_record : Icons.stop_circle_outlined,
+                        show.status == 'Running' ? Colors.green : Colors.grey,
+                        show.status!,
                       ),
-                    if (premiered != null)
-                      _infoChip(Icons.calendar_today, Colors.red, premiered),
-                    if (network != null)
-                      _infoChip(Icons.tv, Colors.blue, network),
+                    if (show.premiered != null)
+                      _infoChip(Icons.calendar_today, Colors.red, show.premiered!),
+                    if (show.network != null)
+                      _infoChip(Icons.tv, Colors.blue, show.network!),
                   ],
                 ),
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    const Icon(Icons.category_outlined,
-                        color: Colors.red, size: 16),
+                    const Icon(Icons.category_outlined, color: Colors.red, size: 16),
                     const SizedBox(width: 6),
                     Expanded(
-                      child: Text(
-                        genres,
-                        style: const TextStyle(
-                            color: Colors.white70, fontSize: 14),
-                      ),
+                      child: Text(genresString, style: const TextStyle(color: Colors.white70, fontSize: 14)),
                     ),
                   ],
                 ),
@@ -201,16 +172,13 @@ class _DetailPageState extends State<DetailPage> {
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: () async {
-                          final url = show['url'] as String?;
-                          if (url != null) {
-                            final uri = Uri.parse(url);
+                          if (show.url != null) {
+                            final uri = Uri.parse(show.url!);
                             if (await canLaunchUrl(uri)) {
-                              await launchUrl(uri,
-                                  mode: LaunchMode.externalApplication);
+                              await launchUrl(uri, mode: LaunchMode.externalApplication);
                             } else {
                               Get.snackbar('Error', 'Tidak bisa membuka URL',
-                                  backgroundColor: const Color(0xFF1A1A1A),
-                                  colorText: Colors.white);
+                                  backgroundColor: const Color(0xFF1A1A1A), colorText: Colors.white);
                             }
                           }
                         },
@@ -220,16 +188,13 @@ class _DetailPageState extends State<DetailPage> {
                     ),
                     const SizedBox(width: 12),
                     Obx(() {
-                      final isFav = _favController.isFavorite(show['id'] as int);
+                      final isFav = _favController.isFavorite(show.id);
                       return ElevatedButton.icon(
                         onPressed: () => _favController.toggleFavorite(show),
-                        icon: Icon(isFav
-                            ? Icons.favorite
-                            : Icons.favorite_border),
+                        icon: Icon(isFav ? Icons.favorite : Icons.favorite_border),
                         label: Text(isFav ? 'Disimpan' : 'Favorit'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              isFav ? Colors.red[800] : Colors.grey[800],
+                          backgroundColor: isFav ? Colors.red[800] : Colors.grey[800],
                         ),
                       );
                     }),
@@ -238,20 +203,12 @@ class _DetailPageState extends State<DetailPage> {
                 const SizedBox(height: 24),
                 const Text(
                   'Ringkasan',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red),
                 ),
                 const SizedBox(height: 10),
                 Text(
                   summary,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    height: 1.6,
-                    fontSize: 14,
-                  ),
+                  style: const TextStyle(color: Colors.white70, height: 1.6, fontSize: 14),
                 ),
                 const SizedBox(height: 24),
               ],
@@ -268,8 +225,7 @@ class _DetailPageState extends State<DetailPage> {
       children: [
         Icon(icon, color: color, size: 14),
         const SizedBox(width: 4),
-        Text(label,
-            style: const TextStyle(color: Colors.white70, fontSize: 13)),
+        Text(label, style: const TextStyle(color: Colors.white70, fontSize: 13)),
       ],
     );
   }

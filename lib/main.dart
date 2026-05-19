@@ -5,13 +5,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'controllers/auth_controller.dart';
 import 'controllers/favorite_controller.dart';
+import 'models/favorite_show_model.dart';
 import 'routes/app_pages.dart';
 import 'routes/app_routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-  await Hive.openBox('favorites');
+  
+  Hive.registerAdapter(FavoriteShowModelAdapter());
+  await Hive.openBox<FavoriteShowModel>('favorites');
 
   final prefs = await SharedPreferences.getInstance();
   final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import '../models/show_model.dart';
 import '../services/api_service.dart';
 
 class ShowController extends GetxController {
-  final RxList<Map<String, dynamic>> shows = <Map<String, dynamic>>[].obs;
+  final RxList<ShowModel> shows = <ShowModel>[].obs;
   final RxBool isLoading = false.obs;
 
   @override

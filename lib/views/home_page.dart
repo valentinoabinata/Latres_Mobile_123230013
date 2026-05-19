@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../controllers/auth_controller.dart';
 import '../controllers/favorite_controller.dart';
 import '../controllers/show_controller.dart';
+import '../models/show_model.dart';
 import '../routes/app_routes.dart';
 
 class HomePage extends StatelessWidget {
@@ -36,10 +37,7 @@ class HomePage extends StatelessWidget {
               children: [
                 CircularProgressIndicator(color: Colors.red),
                 SizedBox(height: 16),
-                Text(
-                  'Memuat data...',
-                  style: TextStyle(color: Colors.grey),
-                ),
+                Text('Memuat data...', style: TextStyle(color: Colors.grey)),
               ],
             ),
           );
@@ -52,8 +50,7 @@ class HomePage extends StatelessWidget {
               children: [
                 const Icon(Icons.tv_off, color: Colors.grey, size: 60),
                 const SizedBox(height: 16),
-                const Text('Tidak ada data',
-                    style: TextStyle(color: Colors.grey)),
+                const Text('Tidak ada data', style: TextStyle(color: Colors.grey)),
                 const SizedBox(height: 12),
                 ElevatedButton(
                   onPressed: _showController.fetchShows,
@@ -64,58 +61,43 @@ class HomePage extends StatelessWidget {
           );
         }
 
-        return CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 20, 16, 4),
-                child: Obx(() => RichText(
-                      text: TextSpan(
-                        style: const TextStyle(fontSize: 16),
-                        children: [
-                          const TextSpan(
-                            text: 'Halo, ',
-                            style: TextStyle(color: Colors.white70),
-                          ),
-                          TextSpan(
-                            text: _authController.username.value.isNotEmpty
-                                ? _authController.username.value
-                                : 'User',
-                            style: const TextStyle(
-                              color: Colors.red,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const TextSpan(
-                            text: ' 👋',
-                            style: TextStyle(color: Colors.white70),
-                          ),
-                        ],
-                      ),
-                    )),
-              ),
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
+              child: Obx(() => RichText(
+                    text: TextSpan(
+                      style: const TextStyle(fontSize: 16),
+                      children: [
+                        const TextSpan(text: 'Halo, ', style: TextStyle(color: Colors.white70)),
+                        TextSpan(
+                          text: _authController.username.value.isNotEmpty
+                              ? _authController.username.value
+                              : 'User',
+                          style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                        ),
+                        const TextSpan(text: ' 👋', style: TextStyle(color: Colors.white70)),
+                      ],
+                    ),
+                  )),
             ),
-            const SliverToBoxAdapter(child: SizedBox(height: 12)),
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              sliver: SliverGrid(
+            Expanded(
+              child: GridView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   childAspectRatio: 0.58,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
                 ),
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final show = _showController.shows[index];
-                    return _ShowCard(
-                        show: show, favController: _favController);
-                  },
-                  childCount: _showController.shows.length,
-                ),
+                itemCount: _showController.shows.length,
+                itemBuilder: (context, index) {
+                  final show = _showController.shows[index];
+                  return _ShowCard(show: show, favController: _favController);
+                },
               ),
             ),
-            const SliverToBoxAdapter(child: SizedBox(height: 12)),
           ],
         );
       }),
@@ -124,18 +106,15 @@ class HomePage extends StatelessWidget {
 }
 
 class _ShowCard extends StatelessWidget {
-  final Map<String, dynamic> show;
+  final ShowModel show;
   final FavoriteController favController;
 
   const _ShowCard({required this.show, required this.favController});
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = show['image']?['medium'] as String?;
-    final rating = show['rating']?['average'];
-
     return GestureDetector(
-      onTap: () => Get.toNamed(Routes.DETAIL, arguments: show['id'] as int),
+      onTap: () => Get.toNamed(Routes.DETAIL, arguments: show.id),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.grey[900],
@@ -147,11 +126,10 @@ class _ShowCard extends StatelessWidget {
           children: [
             Expanded(
               child: ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(12)),
-                child: imageUrl != null
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                child: show.imageUrl != null
                     ? Image.network(
-                        imageUrl,
+                        show.imageUrl!,
                         width: double.infinity,
                         fit: BoxFit.cover,
                         loadingBuilder: (context, child, progress) {
@@ -159,21 +137,18 @@ class _ShowCard extends StatelessWidget {
                           return Container(
                             color: Colors.grey[850],
                             child: const Center(
-                              child: CircularProgressIndicator(
-                                  color: Colors.red, strokeWidth: 2),
+                              child: CircularProgressIndicator(color: Colors.red, strokeWidth: 2),
                             ),
                           );
                         },
                         errorBuilder: (_, __, ___) => Container(
                           color: Colors.grey[850],
-                          child: const Icon(Icons.broken_image,
-                              color: Colors.grey, size: 40),
+                          child: const Icon(Icons.broken_image, color: Colors.grey, size: 40),
                         ),
                       )
                     : Container(
                         color: Colors.grey[850],
-                        child:
-                            const Icon(Icons.tv, color: Colors.grey, size: 50),
+                        child: const Icon(Icons.tv, color: Colors.grey, size: 50),
                       ),
               ),
             ),
@@ -183,12 +158,8 @@ class _ShowCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    show['name'] as String? ?? '-',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                    ),
+                    show.name,
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -201,9 +172,8 @@ class _ShowCard extends StatelessWidget {
                           const Icon(Icons.star, color: Colors.amber, size: 14),
                           const SizedBox(width: 3),
                           Text(
-                            rating != null ? rating.toString() : 'N/A',
-                            style: const TextStyle(
-                                color: Colors.white70, fontSize: 12),
+                            show.rating != null ? show.rating.toString() : 'N/A',
+                            style: const TextStyle(color: Colors.white70, fontSize: 12),
                           ),
                         ],
                       ),
@@ -212,9 +182,7 @@ class _ShowCard extends StatelessWidget {
                             child: Padding(
                               padding: const EdgeInsets.all(4),
                               child: Icon(
-                                favController.isFavorite(show['id'] as int)
-                                    ? Icons.favorite
-                                    : Icons.favorite_border,
+                                favController.isFavorite(show.id) ? Icons.favorite : Icons.favorite_border,
                                 color: Colors.red,
                                 size: 20,
                               ),
