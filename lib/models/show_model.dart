@@ -24,6 +24,7 @@ class ShowModel {
   });
 
   factory ShowModel.fromJson(Map<String, dynamic> json) {
+    // Ekstrak field nested dari JSON
     final image = json['image'] != null ? json['image']['medium'] as String? : null;
     final avgRating = json['rating'] != null ? json['rating']['average'] : null;
     final networkName = json['network'] != null ? json['network']['name'] as String? : null;
@@ -32,6 +33,7 @@ class ShowModel {
       id: json['id'] as int? ?? 0,
       name: json['name'] as String? ?? '-',
       imageUrl: image,
+      // Konversi rating ke double
       rating: avgRating != null ? (avgRating as num).toDouble() : null,
       genres: (json['genres'] as List?)?.map((e) => e.toString()).toList() ?? [],
       summary: json['summary'] as String?,

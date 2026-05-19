@@ -21,10 +21,12 @@ class FavoriteController extends GetxController {
   }
 
   void _loadFavorites() {
+    // Kosongkan jika belum login
     if (_username.isEmpty) {
       favorites.clear();
       return;
     }
+    // Filter favorit milik user ini
     final prefix = '$_username:';
     final items = _box.keys
         .where((k) => k.toString().startsWith(prefix))
@@ -33,6 +35,7 @@ class FavoriteController extends GetxController {
     favorites.assignAll(items);
   }
 
+  // Key unik per user & show
   String _key(int id) => '$_username:$id';
 
   bool isFavorite(int id) => favorites.any((s) => s.id == id);

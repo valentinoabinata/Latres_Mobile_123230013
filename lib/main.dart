@@ -13,10 +13,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   
+  // Daftarkan adapter & buka box
   Hive.registerAdapter(FavoriteShowModelAdapter());
   await Hive.openBox<FavoriteShowModel>('favorites');
 
   final prefs = await SharedPreferences.getInstance();
+  // Cek status login sebelumnya
   final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 
   runApp(MyApp(isLoggedIn: isLoggedIn));
@@ -70,10 +72,12 @@ class MyApp extends StatelessWidget {
           contentTextStyle: TextStyle(color: Colors.white),
         ),
       ),
+      // Inisialisasi controller global
       initialBinding: BindingsBuilder(() {
         Get.put(AuthController());
         Get.put(FavoriteController());
       }),
+      // Tentukan route awal berdasarkan sesi
       initialRoute: isLoggedIn ? Routes.MAIN : Routes.LOGIN,
       getPages: AppPages.pages,
     );

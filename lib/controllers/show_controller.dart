@@ -19,6 +19,7 @@ class ShowController extends GetxController {
       final data = await ApiService.fetchShows();
       shows.assignAll(data);
     } catch (e) {
+      // Gagal ambil data API
       Get.snackbar(
         'Error',
         'Gagal memuat data. Cek koneksi internet.',

@@ -18,6 +18,7 @@ class _DetailPageState extends State<DetailPage> {
   bool _isLoading = true;
   String? _errorMessage;
 
+  // Ambil id dari argumen navigasi
   late final int _showId = Get.arguments as int;
   final FavoriteController _favController = Get.find<FavoriteController>();
 
@@ -46,12 +47,14 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
+  // Hapus tag HTML dari summary
   String _stripHtml(String html) => html.replaceAll(RegExp(r'<[^>]*>'), '').trim();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Detail')),
+      // Switcher: loading / error / konten
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: Colors.red))
           : _errorMessage != null
@@ -112,6 +115,7 @@ class _DetailPageState extends State<DetailPage> {
                       color: Colors.grey[850],
                       child: const Icon(Icons.tv, color: Colors.grey, size: 80),
                     ),
+              // Gradient overlay bawah gambar
               Positioned(
                 bottom: 0,
                 left: 0,
@@ -145,6 +149,7 @@ class _DetailPageState extends State<DetailPage> {
                   children: [
                     _infoChip(Icons.star, Colors.amber, show.rating != null ? '${show.rating} / 10' : 'N/A'),
                     if (show.status != null)
+                      // Ikon berbeda untuk status Running
                       _infoChip(
                         show.status == 'Running' ? Icons.fiber_manual_record : Icons.stop_circle_outlined,
                         show.status == 'Running' ? Colors.green : Colors.grey,
@@ -174,6 +179,7 @@ class _DetailPageState extends State<DetailPage> {
                         onPressed: () async {
                           if (show.url != null) {
                             final uri = Uri.parse(show.url!);
+                            // Validasi sebelum buka URL
                             if (await canLaunchUrl(uri)) {
                               await launchUrl(uri, mode: LaunchMode.externalApplication);
                             } else {
@@ -187,6 +193,7 @@ class _DetailPageState extends State<DetailPage> {
                       ),
                     ),
                     const SizedBox(width: 12),
+                    // Tombol favorit reaktif
                     Obx(() {
                       final isFav = _favController.isFavorite(show.id);
                       return ElevatedButton.icon(

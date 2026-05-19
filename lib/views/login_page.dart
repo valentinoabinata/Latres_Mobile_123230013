@@ -29,6 +29,7 @@ class _LoginPageState extends State<LoginPage> {
     final username = _usernameController.text.trim();
     final password = _passwordController.text.trim();
 
+    // Validasi input kosong
     if (username.isEmpty || password.isEmpty) {
       Get.snackbar(
         'Peringatan',
@@ -90,6 +91,7 @@ class _LoginPageState extends State<LoginPage> {
                   label: 'Password',
                   icon: Icons.lock_outline,
                   obscure: _obscurePassword,
+                  // Toggle visibilitas password
                   suffix: IconButton(
                     icon: Icon(
                       _obscurePassword
@@ -107,6 +109,7 @@ class _LoginPageState extends State<LoginPage> {
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
+                    // Nonaktif saat proses login
                     onPressed: _isLoading ? null : _login,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,

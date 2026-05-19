@@ -20,6 +20,7 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Skuy Nonton!'),
         actions: [
+          // Sembunyikan tombol saat loading
           Obx(() => _showController.isLoading.value
               ? const SizedBox.shrink()
               : IconButton(
@@ -30,6 +31,7 @@ class HomePage extends StatelessWidget {
         ],
       ),
       body: Obx(() {
+        // Tampilan loading
         if (_showController.isLoading.value) {
           return const Center(
             child: Column(
@@ -43,6 +45,7 @@ class HomePage extends StatelessWidget {
           );
         }
 
+        // Tampilan data kosong
         if (_showController.shows.isEmpty) {
           return Center(
             child: Column(
@@ -66,6 +69,7 @@ class HomePage extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
+              // Sambutan dinamis username
               child: Obx(() => RichText(
                     text: TextSpan(
                       style: const TextStyle(fontSize: 16),
@@ -114,6 +118,7 @@ class _ShowCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      // Navigasi ke detail dengan id
       onTap: () => Get.toNamed(Routes.DETAIL, arguments: show.id),
       child: Container(
         decoration: BoxDecoration(
@@ -177,6 +182,7 @@ class _ShowCard extends StatelessWidget {
                           ),
                         ],
                       ),
+                      // Toggle favorit reaktif
                       Obx(() => GestureDetector(
                             onTap: () => favController.toggleFavorite(show),
                             child: Padding(

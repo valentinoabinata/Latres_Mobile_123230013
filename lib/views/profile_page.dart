@@ -23,6 +23,7 @@ class ProfilePage extends StatelessWidget {
               child: const Icon(Icons.person, size: 70, color: Colors.white70),
             ),
             const SizedBox(height: 20),
+            // Username reaktif dari controller
             Obx(() => Text(
                   authController.username.value.isNotEmpty
                       ? authController.username.value
@@ -50,6 +51,7 @@ class ProfilePage extends StatelessWidget {
               width: double.infinity,
               height: 52,
               child: ElevatedButton(
+                // Dialog konfirmasi sebelum logout
                 onPressed: () => Get.defaultDialog(
                   title: 'Logout',
                   titleStyle: const TextStyle(

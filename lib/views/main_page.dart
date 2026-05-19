@@ -23,6 +23,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Pertahankan state setiap tab
       body: IndexedStack(
         index: _currentIndex,
         children: _pages,

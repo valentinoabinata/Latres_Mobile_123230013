@@ -15,6 +15,7 @@ class FavoritePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Favorit')),
       body: Obx(() {
+        // Tampilan daftar kosong
         if (favController.favorites.isEmpty) {
           return const Center(
             child: Column(
@@ -107,6 +108,7 @@ class _FavoriteCard extends StatelessWidget {
                 ],
               ),
             ),
+            // Hapus dari favorit
             IconButton(
               onPressed: () => favController.removeFavorite(show.id),
               icon: const Icon(Icons.delete, color: Colors.red, size: 22),

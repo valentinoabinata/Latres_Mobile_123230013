@@ -16,6 +16,7 @@ class AuthController extends GetxController {
   Future<void> _loadUsername() async {
     final prefs = await SharedPreferences.getInstance();
     username.value = prefs.getString('username') ?? '';
+    // Load favorit jika sudah login
     if (username.value.isNotEmpty) {
       Get.find<FavoriteController>().loadForUser(username.value);
     }
@@ -23,6 +24,7 @@ class AuthController extends GetxController {
 
   Future<bool> login(String inputUsername, String password) async {
     final prefs = await SharedPreferences.getInstance();
+    // Simpan sesi login
     await prefs.setBool('isLoggedIn', true);
     await prefs.setString('username', inputUsername);
     username.value = inputUsername;
@@ -33,6 +35,7 @@ class AuthController extends GetxController {
 
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
+    // Hapus sesi & bersihkan data
     await prefs.remove('isLoggedIn');
     await prefs.remove('username');
     Get.find<FavoriteController>().loadForUser('');
