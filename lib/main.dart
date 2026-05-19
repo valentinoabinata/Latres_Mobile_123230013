@@ -74,8 +74,8 @@ class MyApp extends StatelessWidget {
       ),
       // Inisialisasi controller global
       initialBinding: BindingsBuilder(() {
-        Get.put(AuthController());
         Get.put(FavoriteController());
+        Get.put(AuthController());
       }),
       // Tentukan route awal berdasarkan sesi
       initialRoute: isLoggedIn ? Routes.MAIN : Routes.LOGIN,

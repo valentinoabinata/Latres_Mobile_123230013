@@ -7,7 +7,6 @@ import '../models/show_model.dart';
 class FavoriteController extends GetxController {
   final RxList<FavoriteShowModel> favorites = <FavoriteShowModel>[].obs;
   late Box<FavoriteShowModel> _box;
-  String _username = '';
 
   @override
   void onInit() {
@@ -15,28 +14,10 @@ class FavoriteController extends GetxController {
     _box = Hive.box<FavoriteShowModel>('favorites');
   }
 
-  void loadForUser(String username) {
-    _username = username;
-    _loadFavorites();
-  }
-
-  void _loadFavorites() {
-    // Kosongkan jika belum login
-    if (_username.isEmpty) {
-      favorites.clear();
-      return;
-    }
-    // Filter favorit milik user ini
-    final prefix = '$_username:';
-    final items = _box.keys
-        .where((k) => k.toString().startsWith(prefix))
-        .map((k) => _box.get(k)!)
-        .toList();
+  void loadFavorites() {
+    final items = _box.values.toList();
     favorites.assignAll(items);
   }
-
-  // Key unik per user & show
-  String _key(int id) => '$_username:$id';
 
   bool isFavorite(int id) => favorites.any((s) => s.id == id);
 
@@ -51,7 +32,7 @@ class FavoriteController extends GetxController {
         rating: show.rating,
       );
 
-      _box.put(_key(show.id), favModel);
+      _box.put(show.id, favModel);
       favorites.add(favModel);
       Get.snackbar(
         'Favorit',
@@ -63,7 +44,7 @@ class FavoriteController extends GetxController {
   }
 
   void removeFavorite(int id) {
-    _box.delete(_key(id));
+    _box.delete(id);
     favorites.removeWhere((s) => s.id == id);
   }
 }
